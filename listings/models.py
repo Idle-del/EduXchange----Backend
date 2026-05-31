@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
 
 # Create your models here.
 class Category(models.Model):
@@ -10,6 +11,11 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+def resource_file_path(instance, filename):
+    category_name = instance.category.name.replace(' ', '_') # Replace spaces with underscores for better file paths
+    
+    return f'resources/{category_name}/{filename}'
     
 class Resource(models.Model):
     
@@ -26,9 +32,9 @@ class Resource(models.Model):
     ]
     
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     
-    file = models.FileField(upload_to='resources/') # Files uploaded by users will be stored in the 'resources/' directory
+    file = models.FileField(upload_to=resource_file_path) # Files uploaded by users will be stored in the 'resources/' directory
     
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='resources') # Each resource belongs to a category
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resources', null=True, blank=True) # Each resource is uploaded by a user
