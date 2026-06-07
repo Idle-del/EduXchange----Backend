@@ -8,6 +8,9 @@ from rest_framework import status
 
 from .models import Resource, Category
 from .serializers import ResourceSerializer, CategorySerializer
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import ResourceFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 # Create your views here.
 
@@ -43,8 +46,12 @@ from .serializers import ResourceSerializer, CategorySerializer
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ResourceListCreate(ListCreateAPIView):
-    queryset = Resource.objects.all()
+    queryset = Resource.objects.all().order_by('-created_at')
     serializer_class = ResourceSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ResourceFilter
+    search_fields = ['title', 'description', 'category__name']
+    ordering_fields = ['created_at', 'updated_at', 'title']
     
 class ResourceDetail(RetrieveUpdateDestroyAPIView):
     queryset = Resource.objects.all()
