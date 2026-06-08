@@ -11,6 +11,7 @@ from .serializers import ResourceSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ResourceFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
+from .paginations import CustomPagination
 
 # Create your views here.
 
@@ -52,6 +53,7 @@ class ResourceListCreate(ListCreateAPIView):
     filterset_class = ResourceFilter
     search_fields = ['title', 'description', 'category__name']
     ordering_fields = ['created_at', 'updated_at', 'title']
+    pagination_class = CustomPagination
     
 class ResourceDetail(RetrieveUpdateDestroyAPIView):
     queryset = Resource.objects.all()
