@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 import os
 
 # Create your models here.
@@ -37,7 +37,7 @@ class Resource(models.Model):
     file = models.FileField(upload_to=resource_file_path) # Files uploaded by users will be stored in the 'resources/' directory
     
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='resources') # Each resource belongs to a category
-    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resources', null=True, blank=True) # Each resource is uploaded by a user
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resources', null=True, blank=True) # Each resource is uploaded by a user
     
     semester = models.IntegerField(choices=semester_choices) # Semester field with choices from 1 to 8
     

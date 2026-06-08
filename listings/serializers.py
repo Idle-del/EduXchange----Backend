@@ -14,6 +14,8 @@ class ResourceSerializer(serializers.ModelSerializer):
         model = Resource
         fields = ['id', 'title', 'description', 'file', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at']
         
+        read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
+        
     def get_category_name(self, obj):
         return obj.category.name if obj.category else None
     

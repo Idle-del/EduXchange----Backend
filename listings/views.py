@@ -2,9 +2,7 @@ from django.shortcuts import render
 # from rest_framework.decorators import api_view
 # from rest_framework.views import APIView
 # from rest_framework.generics import GenericAPIView
-from rest_framework.generics import ListAPIView, ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from .models import Resource, Category
 from .serializers import ResourceSerializer, CategorySerializer
@@ -12,6 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ResourceFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .paginations import CustomPagination
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
@@ -54,12 +53,19 @@ class ResourceListCreate(ListCreateAPIView):
     search_fields = ['title', 'description', 'category__name']
     ordering_fields = ['created_at', 'updated_at', 'title']
     pagination_class = CustomPagination
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(uploaded_by=self.request.user)
     
 class ResourceDetail(RetrieveUpdateDestroyAPIView):
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
     lookup_field = 'pk'
+    permission_classes = [IsAuthenticated]
     
 class CategoryList(ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    search_fields = ['name']
+    pagination_class = None  # Disable pagination for categories
