@@ -2,7 +2,7 @@ from django.shortcuts import render
 # from rest_framework.decorators import api_view
 # from rest_framework.views import APIView
 # from rest_framework.generics import GenericAPIView
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -59,3 +59,7 @@ class ResourceDetail(RetrieveUpdateDestroyAPIView):
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
     lookup_field = 'pk'
+    
+class CategoryList(ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
