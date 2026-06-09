@@ -11,6 +11,7 @@ from .filters import ResourceFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .paginations import CustomPagination
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrReadOnly
 
 # Create your views here.
 
@@ -62,7 +63,7 @@ class ResourceDetail(RetrieveUpdateDestroyAPIView):
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
     lookup_field = 'pk'
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
     
 class CategoryList(ListAPIView):
     queryset = Category.objects.all()
