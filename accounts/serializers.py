@@ -31,7 +31,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError('Invalid email or password')
         
         data = super().validate({
-            'username': user.email,
+            'email': user.email,
             'password': password
         })
         
