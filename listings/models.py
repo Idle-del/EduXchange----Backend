@@ -30,9 +30,16 @@ class Resource(models.Model):
          (7, 'Semester 7'),
          (8, 'Semester 8'),
     ]
+    type_choices = [
+        ('free', 'Free'),
+        ('lend', 'Lend'),
+        ('sell', 'Sell'),
+    ]
     
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    
+    type = models.CharField(max_length=10, choices=type_choices, default='free')
     
     file = models.FileField(upload_to=resource_file_path) # Files uploaded by users will be stored in the 'resources/' directory
     

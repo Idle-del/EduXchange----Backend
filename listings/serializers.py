@@ -12,7 +12,7 @@ class ResourceSerializer(serializers.ModelSerializer):
     uploaded_by_name = serializers.SerializerMethodField()
     class Meta:
         model = Resource
-        fields = ['id', 'title', 'description', 'file', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'file', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at', 'type']
         
         read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
         
@@ -23,6 +23,6 @@ class ResourceSerializer(serializers.ModelSerializer):
         return obj.get_semester_display() if obj.semester else None
     
     def get_uploaded_by_name(self, obj):
-        return obj.uploaded_by.username if obj.uploaded_by else None
+        return f'{obj.uploaded_by.first_name} {obj.uploaded_by.last_name}' if obj.uploaded_by else None
 
     
