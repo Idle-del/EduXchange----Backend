@@ -1,6 +1,5 @@
 from django.shortcuts import render
 # from rest_framework.decorators import api_view
-# from rest_framework.views import APIView
 # from rest_framework.generics import GenericAPIView
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
@@ -68,5 +67,6 @@ class ResourceDetail(RetrieveUpdateDestroyAPIView):
 class CategoryList(ListAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [SearchFilter]
     search_fields = ['name']
     pagination_class = None  # Disable pagination for categories

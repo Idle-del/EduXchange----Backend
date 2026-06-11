@@ -41,15 +41,17 @@ class Resource(models.Model):
     
     type = models.CharField(max_length=10, choices=type_choices, default='free')
     
-    file = models.FileField(upload_to=resource_file_path) # Files uploaded by users will be stored in the 'resources/' directory
+    file = models.FileField(upload_to=resource_file_path, null=True, blank=True)
     
+    image = models.ImageField(upload_to='resource_images/', null=True, blank=True) # New field for resource image
+        
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='resources') # Each resource belongs to a category
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resources', null=True, blank=True) # Each resource is uploaded by a user
     
-    semester = models.IntegerField(choices=semester_choices) # Semester field with choices from 1 to 8
+    semester = models.IntegerField(choices=semester_choices, blank=True, null=True) # Semester field with choices from 1 to 8
     
-    created_at = models.DateTimeField(auto_now_add=True) # Timestamp for when the resource was created
-    updated_at = models.DateTimeField(auto_now=True) # Timestamp for when the resource was last updated
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.title
