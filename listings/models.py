@@ -55,3 +55,10 @@ class Resource(models.Model):
     
     def __str__(self):
         return self.title
+    
+class ResourceImage(models.Model):
+    resource = models.ForeignKey(Resource, related_name='extra_images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='resource_images/')
+    
+    def __str__(self):
+        return f"Image for {self.resource.title}"

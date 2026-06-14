@@ -1,26 +1,51 @@
 from rest_framework import serializers
-from .models import Resource, Category
+from .models import Resource, Category, ResourceImage
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
+
+class ResourceImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResourceImage
+        fields = ['id', 'image']
         
 class ResourceSerializer(serializers.ModelSerializer):
     category_name = serializers.SerializerMethodField()
     semester_name = serializers.SerializerMethodField()
     uploaded_by_name = serializers.SerializerMethodField()
+    extra_images = ResourceImageSerializer(many=True, read_only=True)
+    uploaded_images = serializers.ListField(child=serializers.ImageField(max_length=None, allow_empty_file=False, use_url=True), write_only=True, required=False)
     class Meta:
         model = Resource
-        fields = ['id', 'title', 'description', 'file', 'image', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at', 'type']
+        fields = ['id', 'title', 'description', 'file', 'image','extra_images','uploaded_images', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at', 'type']
         
         read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
+        
+    def create(self, validated_data):
+        uploaded_images = validated_data.pop('uploaded_images', [])
+        resource = Resource.objects.create(**validated_data)
+        
+        for image in uploaded_images:
+            ResourceImage.objects.create(resource=resource, image=image)
+        return resource
     
+    def update(self, instance, validated_data):
+        uploaded_images = validated_data.pop('uploaded_images', [])
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        for image in uploaded_images:
+            ResourceImage.objects.create(resource=instance, image=image)
+        return instance
+
     def validate(self, attrs):
         file = attrs.get('file', getattr(self.instance, 'file', None))
         image = attrs.get('image', getattr(self.instance, 'image', None))
+        uploaded_images = attrs.get('uploaded_images', [])
         
-        if not file and not image:
+        if not file and not image and not uploaded_images:
             raise serializers.ValidationError('Either a file or an image is required.')
         return attrs
 
