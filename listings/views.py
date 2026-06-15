@@ -1,16 +1,16 @@
 from django.shortcuts import render
 # from rest_framework.decorators import api_view
 # from rest_framework.generics import GenericAPIView
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, DestroyAPIView
 
-from .models import Resource, Category
+from .models import Resource, Category, ResourceImage
 from .serializers import ResourceSerializer, CategorySerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ResourceFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .paginations import CustomPagination
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsResourceImageOwnerOrReadOnly
 
 # Create your views here.
 
@@ -70,3 +70,7 @@ class CategoryList(ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ['name']
     pagination_class = None  # Disable pagination for categories
+    
+class DeleteImageResource(DestroyAPIView):
+    queryset = ResourceImage.objects.all()
+    permission_classes = [IsAuthenticated, IsResourceImageOwnerOrReadOnly]
