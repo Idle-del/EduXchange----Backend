@@ -35,11 +35,20 @@ class Resource(models.Model):
         ('lend', 'Lend'),
         ('sell', 'Sell'),
     ]
+    status_choices = [
+        ('available', 'Available'),
+        ('lent', 'Lent'),
+        ('sold', 'Sold'),
+    ]
+    
+    status = models.CharField(max_length=10, choices=status_choices, default='available')
     
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     
     type = models.CharField(max_length=10, choices=type_choices, default='free')
+    
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
     
     file = models.FileField(upload_to=resource_file_path, null=True, blank=True)
     
