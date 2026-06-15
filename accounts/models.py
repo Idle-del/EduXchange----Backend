@@ -22,6 +22,10 @@ class UserManager(BaseUserManager):
     
 class CustomUser(AbstractUser, PermissionsMixin):
     username = None
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    bio = models.TextField(blank=True)
+    department = models.CharField(max_length=100, blank=True)
+    semester = models.IntegerField(null=True, blank=True)
     email = models.EmailField(unique=True)
     
     is_staff = models.BooleanField(default=False)

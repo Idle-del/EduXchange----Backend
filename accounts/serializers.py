@@ -8,14 +8,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'password', 'first_name', 'last_name']
+        fields = ['id', 'email', 'password', 'first_name','profile_picture', 'last_name', 'bio', 'department', 'semester']
         
     def create(self, validated_data):
         password = validated_data.pop('password')
-        user = CustomUser(**validated_data)
-        user.set_password(password)
-        user.save()
-            
+        user = CustomUser.objects.create_user(password=password, **validated_data)
         return user
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -39,5 +36,9 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['first_name'] = user.first_name
         data['last_name'] = user.last_name
         data['id'] = user.id
+        data['profile_picture'] = user.profile_picture.url if user.profile_picture else None
+        data['bio'] = user.bio
+        data['department'] = user.department
+        data['semester'] = user.semester
         
         return data
