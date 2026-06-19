@@ -33,6 +33,7 @@ class ResourceSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
+        validated_data.pop('type', None)  # Prevent updating the type field
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
