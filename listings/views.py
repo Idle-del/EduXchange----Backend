@@ -1,5 +1,5 @@
 from django.shortcuts import render
-# from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view
 # from rest_framework.generics import GenericAPIView
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, DestroyAPIView
 
@@ -11,6 +11,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from .paginations import CustomPagination
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly, IsResourceImageOwnerOrReadOnly
+from rest_framework.response import Response
 
 # Create your views here.
 
@@ -74,3 +75,16 @@ class CategoryList(ListAPIView):
 class DeleteImageResource(DestroyAPIView):
     queryset = ResourceImage.objects.all()
     permission_classes = [IsAuthenticated, IsResourceImageOwnerOrReadOnly]
+    
+@api_view(['GET'])
+def semesterList(request):
+    semesters = [
+        {'value': value, 'label': label} for value, label in Resource.semester_choices
+    ]
+    return Response(semesters)
+
+@api_view(['GET'])
+def categoryList(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
