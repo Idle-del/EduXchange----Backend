@@ -6,6 +6,8 @@ from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView,
 from rest_framework.permissions import IsAuthenticated
 from .serializers import EmailTokenObtainPairSerializer
 from .permissions import IsOwner
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 # Create your views here.
 class CustomUserCreateView(CreateAPIView):
     queryset = CustomUser.objects.all()
@@ -27,3 +29,15 @@ class CustomUserRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     
     def get_object(self):
         return self.request.user
+    
+@api_view(['GET'])
+def verify_email(request, token):
+    try:
+        user = CustomUser.objects.get(email_token=token)
+        user.is_verified= True
+        user.email_token = None
+        user.save()
+        
+        return Response({"message": "Email verified successfully."}, status=200)
+    except CustomUser.DoesNotExist:
+        return Response({"error": "Invalid token."}, status=400)

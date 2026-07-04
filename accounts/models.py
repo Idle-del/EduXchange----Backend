@@ -28,6 +28,10 @@ class CustomUser(AbstractUser, PermissionsMixin):
     semester = models.IntegerField(null=True, blank=True)
     email = models.EmailField(unique=True)
     
+    email_token = models.CharField(max_length=100, blank=True, null=True)
+    
+    is_verified = models.BooleanField(default=False)
+    
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     

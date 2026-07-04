@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
+from .utils import generate_email_token, send_verification_email
 
 class CustomUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8, required=True)
@@ -12,7 +13,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         password = validated_data.pop('password')
+        validated_data['email_token'] = generate_email_token()
+        validated_data['is_verified'] = False
         user = CustomUser.objects.create_user(password=password, **validated_data)
+        send_verification_email(user.email, user.email_token)
         return user
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -23,6 +27,9 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         password = attrs.get('password')
         
         user = CustomUser.objects.filter(email=email).first()
+        
+        if user and not user.is_verified:
+            raise serializers.ValidationError('Email is not verified. Please check your email for verification link.')
         
         if not user or not user.check_password(password):
             raise serializers.ValidationError('Invalid email or password')
