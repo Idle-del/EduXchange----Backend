@@ -5,11 +5,12 @@ from django.contrib.auth import get_user_model
 from .utils import generate_email_token, send_verification_email
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    semester_name = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True, min_length=8, required=True)
     
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'password', 'first_name','profile_picture', 'last_name', 'bio', 'department', 'semester']
+        fields = ['id', 'email', 'password', 'first_name','profile_picture', 'last_name', 'bio', 'department', 'semester', 'semester_name']
         
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -18,7 +19,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.create_user(password=password, **validated_data)
         send_verification_email(user.email, user.email_token)
         return user
-
+    
+    def get_semester_name(self, obj):
+        return obj.get_semester_display() if obj.semester else None
+    
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = CustomUser.EMAIL_FIELD
     

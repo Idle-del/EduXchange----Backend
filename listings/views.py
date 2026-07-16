@@ -79,12 +79,6 @@ class DeleteImageResource(DestroyAPIView):
 @api_view(['GET'])
 def semesterList(request):
     semesters = [
-        {'value': value, 'label': label} for value, label in Resource.semester_choices
+        {'id': value, 'name': label} for value, label in Resource.semester_choices
     ]
     return Response(semesters)
-
-@api_view(['GET'])
-def categoryList(request):
-    categories = Category.objects.all()
-    serializer = CategorySerializer(categories, many=True)
-    return Response(serializer.data)

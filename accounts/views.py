@@ -8,10 +8,12 @@ from .serializers import EmailTokenObtainPairSerializer
 from .permissions import IsOwner
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 class CustomUserCreateView(CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    parser_classes = [MultiPartParser, FormParser]
     permission_classes = []  # Allow anyone to create an account
 
 class EmailTokenObtainPairView(TokenObtainPairView):
@@ -37,6 +39,7 @@ def verify_email(request, token):
         user.is_verified= True
         user.email_token = None
         user.save()
+        print(f"User {user.email} has been verified.")
         
         return Response({"message": "Email verified successfully."}, status=200)
     except CustomUser.DoesNotExist:
