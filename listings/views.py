@@ -83,6 +83,20 @@ def semesterList(request):
     ]
     return Response(semesters)
 
+@api_view(['GET'])
+def statusList(request):
+    statuses = [
+        {'id': value, 'name': label} for value, label in Resource.status_choices
+    ]
+    return Response(statuses)
+
+@api_view(['GET'])
+def typeList(request):
+    types = [
+        {'id': value, 'name': label} for value, label in Resource.type_choices
+    ]
+    return Response(types)
+
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 # def userResources(request):

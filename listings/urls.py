@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import DeleteImageResource, ResourceListCreate, ResourceDetail, CategoryList, semesterList, UserResources
+from .views import DeleteImageResource, ResourceListCreate, ResourceDetail, CategoryList, semesterList, UserResources, statusList, typeList
 
 urlpatterns = [
     path('resources/', ResourceListCreate.as_view(), name='resource-list-create'),
@@ -9,4 +9,6 @@ urlpatterns = [
     path('delete-image/<int:pk>/', DeleteImageResource.as_view(), name='delete-image-resource'),
     path('semesters/', semesterList, name='semester-list'),
     path('resources/user/', UserResources.as_view(), name='user-resources'),
+    path('statuses/', statusList, name='status-list'),
+    path('types/', typeList, name='type-list'),
 ] 
