@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 # from rest_framework.generics import GenericAPIView
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, DestroyAPIView
 
@@ -82,3 +82,26 @@ def semesterList(request):
         {'id': value, 'name': label} for value, label in Resource.semester_choices
     ]
     return Response(semesters)
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def userResources(request):
+#     resources = Resource.objects.filter(
+#         uploaded_by=request.user
+#     ).order_by('-created_at')
+
+#     serializer = ResourceSerializer(
+#         resources,
+#         many=True,
+#         context={'request': request},
+#     )
+
+#     return Response(serializer.data)
+
+class UserResources(ListAPIView):
+    serializer_class = ResourceSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Resource.objects.filter(uploaded_by=user).order_by('-created_at')
