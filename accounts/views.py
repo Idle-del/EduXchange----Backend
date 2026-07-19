@@ -1,12 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import CustomUser
 from .serializers import CustomUserSerializer
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from .serializers import EmailTokenObtainPairSerializer
 from .permissions import IsOwner
-from rest_framework.decorators import api_view
+from rest_framework.decorators import APIView, api_view
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
@@ -19,10 +19,21 @@ class CustomUserCreateView(CreateAPIView):
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
     
-class UserListView(ListAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
+class UserProfile(APIView):
     permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        user = get_object_or_404(CustomUser, pk=pk)
+        
+        return Response({
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "profile_picture": (
+                user.profile_picture.url
+                if user.profile_picture else None
+            )
+        })
     
 class CustomUserRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
