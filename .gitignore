@@ -23,3 +23,5 @@ Thumbs.db
 
 # Database backup
 data.json
+
+staticfiles/
