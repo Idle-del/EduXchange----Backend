@@ -9,8 +9,8 @@ __pycache__/
 # Django
 db.sqlite3
 
-# Media uploads
-media/
+#Exclude PDFs
+media/resources/
 
 # VS Code
 .vscode/
