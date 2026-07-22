@@ -7,7 +7,10 @@ def generate_email_token():
 
 def send_verification_email(email, token):
     subject = "Verify your email"
-    message = f"Please verify your email by clicking the following link: http://127.0.0.1:8000/api/auth/verify-email/{token}/"
+    message = (
+    f"Please verify your email by clicking the following link:\n"
+    f"{settings.BACKEND_URL}/api/auth/verify-email/{token}/"
+)
     send_mail(
         subject,
         message,

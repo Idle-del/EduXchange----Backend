@@ -60,6 +60,7 @@ cloudinary.config(
     api_secret=config("CLOUDINARY_API_SECRET"),
 )
 
+BACKEND_URL = config("BACKEND_URL")
 # Application definition
 
 INSTALLED_APPS = [
