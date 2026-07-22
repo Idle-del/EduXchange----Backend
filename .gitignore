@@ -20,3 +20,6 @@ media/
 Thumbs.db
 
 .env
+
+# Database backup
+data.json
