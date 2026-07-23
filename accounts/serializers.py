@@ -18,8 +18,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         validated_data['is_verified'] = False
         user = CustomUser.objects.create_user(password=password, **validated_data)
         
-        # Temporarily disabled
-        # send_verification_email(user.email, user.email_token)
+        send_verification_email(user.email, user.email_token)
         return user
     
     def get_semester_name(self, obj):

@@ -12,9 +12,9 @@ def send_verification_email(email, token):
     f"{settings.BACKEND_URL}/api/auth/verify-email/{token}/"
 )
     send_mail(
-        subject,
-        message,
-        settings.EMAIL_HOST_USER,
-        [email],
-        fail_silently=False,
+    subject,
+    message,
+    settings.DEFAULT_FROM_EMAIL,
+    [email],
+    fail_silently=False,
 )
