@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 from rest_framework_simplejwt.views import TokenObtainPairView
+from accounts.utils import generate_password_reset_token, send_password_reset_email
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
@@ -57,5 +58,38 @@ def verify_email(request, token):
         print(f"User {user.email} has been verified.")
         
         return Response({"message": "Email verified successfully."}, status=200)
+    except CustomUser.DoesNotExist:
+        return Response({"error": "Invalid token."}, status=400)
+    
+@api_view(['POST'])
+def forget_password(request):
+    email = request.data.get('email')
+    try:
+        user = CustomUser.objects.get(email=email)
+        user.reset_password_token = generate_password_reset_token()
+        
+        # Temporarily commented out the email sending for testing purposes
+        # send_password_reset_email(user.email, user.reset_password_token)
+        
+        user.save()
+        return Response({"message": "Password reset instructions sent to your email."}, status=200)
+    except CustomUser.DoesNotExist:
+        return Response({"error": "User with this email does not exist."}, status=400)
+    
+@api_view(['POST'])
+def reset_password(request, token):
+    try:
+        user = CustomUser.objects.get(reset_password_token=token)
+        
+        new_password = request.data.get('password')
+        if not new_password:
+            return Response(
+        {"error": "Password is required."},status=400)
+        if len(new_password) < 8:
+            return Response({"error": "Password must be at least 8 characters."},status=400)
+        user.set_password(new_password)
+        user.reset_password_token = None
+        user.save()
+        return Response({"message": "Password reset successfully."}, status=200)
     except CustomUser.DoesNotExist:
         return Response({"error": "Invalid token."}, status=400)

@@ -42,6 +42,8 @@ class CustomUser(AbstractUser, PermissionsMixin):
     
     email_token = models.CharField(max_length=100, blank=True, null=True)
     
+    reset_password_token = models.CharField(max_length=100, blank=True, null=True)
+    
     is_verified = models.BooleanField(default=False)
     
     is_staff = models.BooleanField(default=False)

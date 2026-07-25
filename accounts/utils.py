@@ -47,3 +47,21 @@ def send_verification_email(email, token):
     )
 
     print("send_mail returned:", result)
+
+def generate_password_reset_token():
+    return str(uuid4())
+    
+def send_password_reset_email(email, token):
+    
+    subject = "Reset your password"
+    message = (
+        f"Please reset your password by clicking the following link:\n"
+        f"{settings.BACKEND_URL}/api/auth/reset-password/{token}/"
+    )
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+        fail_silently=False,
+    )
