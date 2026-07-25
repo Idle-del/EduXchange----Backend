@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from rest_framework_simplejwt.views import TokenObtainPairView
 from accounts.utils import generate_password_reset_token, send_password_reset_email
@@ -93,3 +94,7 @@ def reset_password(request, token):
         return Response({"message": "Password reset successfully."}, status=200)
     except CustomUser.DoesNotExist:
         return Response({"error": "Invalid token."}, status=400)
+    
+
+def app_link(request, token):
+    return HttpResponse("Open this link using the EduXchange app.")

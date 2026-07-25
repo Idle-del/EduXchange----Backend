@@ -56,7 +56,7 @@ def send_password_reset_email(email, token):
     subject = "Reset your password"
     message = (
         f"Please reset your password by clicking the following link:\n"
-        f"{settings.BACKEND_URL}/api/auth/reset-password/{token}/"
+        f"{settings.BACKEND_URL}/reset-password/{token}"
     )
     send_mail(
         subject,
