@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kiran.edu_xchange",
+      "sha256_cert_fingerprints": [
+        "87:7B:CB:F0:5D:10:8C:62:62:4E:BC:98:BD:AC:E8:3B:72:BA:04:36:42:83:EE:D8:E6:5C:BA:93:5C:04:5A:F0"
+      ]
+    }
+  }
+]
