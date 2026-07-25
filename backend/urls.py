@@ -19,27 +19,16 @@ from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.static import serve
-import os
-
-from accounts.views import app_link
+from accounts.views import reset_password
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     
     path('api/', include('listings.urls')),
     path('api/auth/', include('accounts.urls')),
-    path(
+     path(
         'reset-password/<str:token>/',
-        app_link,
-        name='app-link-reset-password',
+        reset_password,
+        name='reset-password-web',
     ),
-    path(
-        ".well-known/assetlinks.json",
-        serve,
-        {
-            "document_root": os.path.join(settings.BASE_DIR, "static", ".well-known"),
-            "path": "assetlinks.json",
-        },
-    )
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

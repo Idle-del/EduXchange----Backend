@@ -10,5 +10,4 @@ urlpatterns = [
     path('user/<int:pk>/', UserProfile.as_view(), name='user-list'),
     path('verify-email/<token>/', verify_email, name='verify-email'),
     path('forget-password/', forget_password, name='forget-password'),
-    path('reset-password/<token>/', reset_password, name='reset-password')
 ]

@@ -77,24 +77,72 @@ def forget_password(request):
     except CustomUser.DoesNotExist:
         return Response({"error": "User with this email does not exist."}, status=400)
     
-@api_view(['POST'])
+
 def reset_password(request, token):
     try:
         user = CustomUser.objects.get(reset_password_token=token)
-        
-        new_password = request.data.get('password')
-        if not new_password:
-            return Response(
-        {"error": "Password is required."},status=400)
-        if len(new_password) < 8:
-            return Response({"error": "Password must be at least 8 characters."},status=400)
-        user.set_password(new_password)
-        user.reset_password_token = None
-        user.save()
-        return Response({"message": "Password reset successfully."}, status=200)
-    except CustomUser.DoesNotExist:
-        return Response({"error": "Invalid token."}, status=400)
-    
 
-def app_link(request, token):
-    return HttpResponse("Open this link using the EduXchange app.")
+    except CustomUser.DoesNotExist:
+        return render(
+            request,
+            "reset_success.html",
+            {
+                "success": False,
+                "message": "This password reset link is invalid or has already been used."
+            }
+        )
+
+    if request.method == "GET":
+        return render(
+            request,
+            "reset_password.html",
+            {
+                "token": token
+            }
+        )
+
+    password = request.POST.get("password")
+    confirm = request.POST.get("confirm")
+
+    if not password:
+        return render(
+            request,
+            "reset_password.html",
+            {
+                "token": token,
+                "error": "Password is required."
+            }
+        )
+
+    if len(password) < 8:
+        return render(
+            request,
+            "reset_password.html",
+            {
+                "token": token,
+                "error": "Password must be at least 8 characters."
+            }
+        )
+
+    if password != confirm:
+        return render(
+            request,
+            "reset_password.html",
+            {
+                "token": token,
+                "error": "Passwords do not match."
+            }
+        )
+
+    user.set_password(password)
+    user.reset_password_token = None
+    user.save()
+
+    return render(
+        request,
+        "reset_successful.html",
+        {
+            "success": True,
+            "message": "Your password has been changed successfully."
+        }
+    )
