@@ -2,6 +2,7 @@
 
 import listings.models
 from django.db import migrations, models
+from cloudinary.models import CloudinaryField
 
 
 class Migration(migrations.Migration):
@@ -19,6 +20,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resource',
             name='file',
-            field=models.FileField(blank=True, null=True, upload_to=listings.models.resource_file_path),
+            field=CloudinaryField(
+                resource_type="raw",
+                blank=True,
+                null=True,
+            ),
         ),
     ]

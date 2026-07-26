@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 import os
 
+from cloudinary.models import CloudinaryField
+
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -12,10 +14,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
-def resource_file_path(instance, filename):
-    category_name = instance.category.name.replace(' ', '_') # Replace spaces with underscores for better file paths
-    
-    return f'resources/{category_name}/{filename}'
     
 class Resource(models.Model):
     
@@ -50,7 +48,11 @@ class Resource(models.Model):
     
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) 
     
-    file = models.FileField(upload_to=resource_file_path, null=True, blank=True)
+    file = CloudinaryField(
+    resource_type="raw",
+    blank=True,
+    null=True,
+)
     
     image = models.ImageField(upload_to='resource_images/', null=True, blank=True) # New field for resource image
         

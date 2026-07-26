@@ -4,6 +4,7 @@ import django.db.models.deletion
 import listings.models
 from django.conf import settings
 from django.db import migrations, models
+from cloudinary.models import CloudinaryField
 
 
 class Migration(migrations.Migration):
@@ -31,7 +32,16 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=100)),
                 ('description', models.TextField(blank=True)),
-                ('file', models.FileField(upload_to=listings.models.resource_file_path)),
+                ('file', CloudinaryField(
+                    resource_type="raw",
+                    blank=True,
+                    null=True,
+                )),
+                ('image', CloudinaryField(
+                    resource_type="image",
+                    blank=True,
+                    null=True,
+                )),
                 ('semester', models.IntegerField(choices=[(1, 'Semester 1'), (2, 'Semester 2'), (3, 'Semester 3'), (4, 'Semester 4'), (5, 'Semester 5'), (6, 'Semester 6'), (7, 'Semester 7'), (8, 'Semester 8')])),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),

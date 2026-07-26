@@ -16,6 +16,7 @@ class ResourceSerializer(serializers.ModelSerializer):
     semester_name = serializers.SerializerMethodField()
     uploaded_by_name = serializers.SerializerMethodField()
     extra_images = ResourceImageSerializer(many=True, read_only=True)
+    file = serializers.SerializerMethodField()
     uploaded_images = serializers.ListField(child=serializers.ImageField(max_length=None, allow_empty_file=False, use_url=True), write_only=True, required=False)
     class Meta:
         model = Resource
@@ -68,4 +69,9 @@ class ResourceSerializer(serializers.ModelSerializer):
     
     def get_uploaded_by_name(self, obj):
         # return f'{obj.uploaded_by.first_name} {obj.uploaded_by.last_name}' if obj.uploaded_by else None 
-        return obj.uploaded_by.get_full_name() if obj.uploaded_by else None            
+        return obj.uploaded_by.get_full_name() if obj.uploaded_by else None      
+    
+    def get_file(self, obj):
+        if obj.file:
+            return obj.file.build_url(secure=True)  # Ensure the URL is HTTPS
+        return None      
