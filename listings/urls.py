@@ -1,6 +1,18 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import DeleteImageResource, ResourceListCreate, ResourceDetail, CategoryList, semesterList, UserResources, statusList, typeList
+from .views import (
+    DeleteImageResource,
+    ResourceListCreate,
+    ResourceDetail,
+    CategoryList,
+    semesterList,
+    UserResources,
+    statusList,
+    typeList,
+    addFavorite,
+    removeFavorite,
+    UserFavorites
+)
 
 urlpatterns = [
     path('resources/', ResourceListCreate.as_view(), name='resource-list-create'),
@@ -11,4 +23,7 @@ urlpatterns = [
     path('resources/user/', UserResources.as_view(), name='user-resources'),
     path('statuses/', statusList, name='status-list'),
     path('types/', typeList, name='type-list'),
+    path('resources/<int:pk>/favorite/',addFavorite,name='add-favorite'),
+    path('resources/<int:pk>/remove-favorite/',removeFavorite,name='remove-favorite'),
+    path('favorites/', UserFavorites.as_view(), name='user-favorites'),
 ] 

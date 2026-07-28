@@ -4,8 +4,9 @@ from rest_framework.decorators import api_view, permission_classes
 # from rest_framework.generics import GenericAPIView
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, DestroyAPIView
 
-from .models import Resource, Category, ResourceImage
-from .serializers import ResourceSerializer, CategorySerializer
+from .models import Resource, Category, ResourceImage, Favorite
+from .serializers import ResourceSerializer, CategorySerializer, ResourceImageSerializer
+from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ResourceFilter
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -120,3 +121,63 @@ class UserResources(ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Resource.objects.filter(uploaded_by=user).order_by('-created_at')
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def addFavorite(request, pk):
+
+    resource = Resource.objects.get(id=pk)
+
+    favorite, created = Favorite.objects.get_or_create(
+        user=request.user,
+        resource=resource
+    )
+
+    if not created:
+        return Response(
+            {"message":"Already added to favorites"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+    return Response(
+        {"message":"Added to favorites"},
+        status=status.HTTP_201_CREATED
+    )
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def removeFavorite(request, pk):
+
+    try:
+        favorite = Favorite.objects.get(
+            user=request.user,
+            resource_id=pk
+        )
+
+        favorite.delete()
+
+        return Response(
+            {"message":"Removed from favorites"},
+            status=status.HTTP_200_OK
+        )
+
+
+    except Favorite.DoesNotExist:
+
+        return Response(
+            {"message":"Favorite not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+        
+class UserFavorites(ListAPIView):
+
+    serializer_class = ResourceSerializer
+    permission_classes = [IsAuthenticated]
+
+
+    def get_queryset(self):
+
+        return Resource.objects.filter(
+            favorited_by__user=self.request.user
+        ).order_by('-favorited_by__created_at')

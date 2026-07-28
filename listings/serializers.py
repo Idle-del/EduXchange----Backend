@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Resource, Category, ResourceImage
+from .models import Resource, Category, ResourceImage, Favorite
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,12 +15,14 @@ class ResourceSerializer(serializers.ModelSerializer):
     category_name = serializers.SerializerMethodField()
     semester_name = serializers.SerializerMethodField()
     uploaded_by_name = serializers.SerializerMethodField()
+    is_favorite = serializers.SerializerMethodField()
+    favorite_count = serializers.SerializerMethodField()
     extra_images = ResourceImageSerializer(many=True, read_only=True)
     file = serializers.SerializerMethodField()
     uploaded_images = serializers.ListField(child=serializers.ImageField(max_length=None, allow_empty_file=False, use_url=True), write_only=True, required=False)
     class Meta:
         model = Resource
-        fields = ['id','status', 'title', 'description', 'file', 'image','extra_images','uploaded_images', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at', 'type', 'price']
+        fields = ['id','status', 'title', 'description', 'file', 'image','extra_images','uploaded_images', 'category', 'category_name', 'uploaded_by', 'semester', 'semester_name', 'uploaded_by_name', 'created_at', 'updated_at', 'type', 'price', 'is_favorite', 'favorite_count']
         
         read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
         
@@ -75,3 +77,27 @@ class ResourceSerializer(serializers.ModelSerializer):
         if obj.file:
             return obj.file.build_url(secure=True)  # Ensure the URL is HTTPS
         return None      
+    
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+
+        if request and request.user.is_authenticated:
+            return Favorite.objects.filter(
+                user=request.user,
+                resource=obj
+            ).exists()
+        return False
+
+    def get_favorite_count(self, obj):
+
+        return obj.favorited_by.count()
+    
+class FavoriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Favorite
+        fields = [
+            'id',
+            'resource',
+            'created_at'
+        ]
