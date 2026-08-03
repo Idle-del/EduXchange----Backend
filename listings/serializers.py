@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db import transaction
 from .models import Resource, Category, ResourceImage, Favorite
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -18,7 +19,7 @@ class ResourceSerializer(serializers.ModelSerializer):
     is_favorite = serializers.SerializerMethodField()
     favorite_count = serializers.SerializerMethodField()
     extra_images = ResourceImageSerializer(many=True, read_only=True)
-    file = serializers.SerializerMethodField()
+    file = serializers.FileField(required=False, allow_null=True)
     uploaded_images = serializers.ListField(child=serializers.ImageField(max_length=None, allow_empty_file=False, use_url=True), write_only=True, required=False)
     class Meta:
         model = Resource
@@ -26,22 +27,26 @@ class ResourceSerializer(serializers.ModelSerializer):
         
         read_only_fields = ['uploaded_by', 'created_at', 'updated_at']
         
+    def save_uploaded_images(self, resource, uploaded_images):
+        for image in uploaded_images:
+            ResourceImage.objects.create(resource=resource, image=image)
+        
+    @transaction.atomic
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
         resource = Resource.objects.create(**validated_data)
         
-        for image in uploaded_images:
-            ResourceImage.objects.create(resource=resource, image=image)
+        self.save_uploaded_images(resource, uploaded_images)
         return resource
     
+    @transaction.atomic
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
         validated_data.pop('type', None)  # Prevent updating the type field
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        for image in uploaded_images:
-            ResourceImage.objects.create(resource=instance, image=image)
+        self.save_uploaded_images(instance, uploaded_images)
         return instance
 
     def validate(self, attrs):
@@ -73,10 +78,13 @@ class ResourceSerializer(serializers.ModelSerializer):
         # return f'{obj.uploaded_by.first_name} {obj.uploaded_by.last_name}' if obj.uploaded_by else None 
         return obj.uploaded_by.get_full_name() if obj.uploaded_by else None      
     
-    def get_file(self, obj):
-        if obj.file:
-            return obj.file.build_url(secure=True)  # Ensure the URL is HTTPS
-        return None      
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.file:
+            representation['file'] = instance.file.build_url(secure=True)
+        else:
+            representation['file'] = None
+        return representation      
     
     def get_is_favorite(self, obj):
         request = self.context.get('request')
