@@ -75,7 +75,6 @@ class ResourceSerializer(serializers.ModelSerializer):
         return obj.get_semester_display() if obj.semester else None
     
     def get_uploaded_by_name(self, obj):
-        # return f'{obj.uploaded_by.first_name} {obj.uploaded_by.last_name}' if obj.uploaded_by else None 
         return obj.uploaded_by.get_full_name() if obj.uploaded_by else None      
     
     def to_representation(self, instance):
@@ -90,6 +89,9 @@ class ResourceSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
 
         if request and request.user.is_authenticated:
+            # Check if favorited_by cache/prefetch is present or fallback to DB query
+            if hasattr(obj, '_prefetched_objects_cache') and 'favorited_by' in obj._prefetched_objects_cache:
+                return any(fav.user_id == request.user.id for fav in obj.favorited_by.all())
             return Favorite.objects.filter(
                 user=request.user,
                 resource=obj
@@ -97,7 +99,10 @@ class ResourceSerializer(serializers.ModelSerializer):
         return False
 
     def get_favorite_count(self, obj):
-
+        if hasattr(obj, 'favorite_count_annotated'):
+            return obj.favorite_count_annotated
+        if hasattr(obj, '_prefetched_objects_cache') and 'favorited_by' in obj._prefetched_objects_cache:
+            return len(obj.favorited_by.all())
         return obj.favorited_by.count()
     
 class FavoriteSerializer(serializers.ModelSerializer):

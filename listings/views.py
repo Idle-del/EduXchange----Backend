@@ -49,7 +49,7 @@ from rest_framework.response import Response
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ResourceListCreate(ListCreateAPIView):
-    queryset = Resource.objects.all().order_by('-created_at')
+    queryset = Resource.objects.select_related('category', 'uploaded_by').prefetch_related('extra_images', 'favorited_by').order_by('-created_at')
     serializer_class = ResourceSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ResourceFilter
@@ -62,7 +62,7 @@ class ResourceListCreate(ListCreateAPIView):
         serializer.save(uploaded_by=self.request.user)
     
 class ResourceDetail(RetrieveUpdateDestroyAPIView):
-    queryset = Resource.objects.all()
+    queryset = Resource.objects.select_related('category', 'uploaded_by').prefetch_related('extra_images', 'favorited_by')
     serializer_class = ResourceSerializer
     lookup_field = 'pk'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -120,7 +120,7 @@ class UserResources(ListAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        return Resource.objects.filter(uploaded_by=user).order_by('-created_at')
+        return Resource.objects.select_related('category', 'uploaded_by').prefetch_related('extra_images', 'favorited_by').filter(uploaded_by=user).order_by('-created_at')
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -178,6 +178,6 @@ class UserFavorites(ListAPIView):
 
     def get_queryset(self):
 
-        return Resource.objects.filter(
+        return Resource.objects.select_related('category', 'uploaded_by').prefetch_related('extra_images', 'favorited_by').filter(
             favorited_by__user=self.request.user
         ).order_by('-favorited_by__created_at')
